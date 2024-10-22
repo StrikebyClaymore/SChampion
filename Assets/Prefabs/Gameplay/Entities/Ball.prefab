@@ -162,6 +162,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <RB>k__BackingField: {fileID: 3076002131756708436}
+  <Collider>k__BackingField: {fileID: 2836587394016821126}
   <HalfSize>k__BackingField: 0.35
   InitialOffset: 0
   _initForce: 3.5
+  _initialScale: {x: 0, y: 0, z: 0}
+  _endScale: {x: 0.28, y: 0.28, z: 1}

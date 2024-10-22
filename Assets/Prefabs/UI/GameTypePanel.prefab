@@ -242,7 +242,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 70.9
+  m_fontSize: 66.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -384,6 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6700695110999525382}
   - component: {fileID: 609376938475529876}
+  - component: {fileID: 583547889237698909}
   m_Layer: 5
   m_Name: GameTypePanel
   m_TagString: Untagged
@@ -427,9 +428,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ce0647f67854ec1ae3177ebb594c1b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Rect>k__BackingField: {fileID: 6700695110999525382}
   _icon: {fileID: 8195954926179763605}
   _nameText: {fileID: 838204014304968587}
   _unlockText: {fileID: 6752464528613060522}
+  _notSelectedScale: {x: 0.76, y: 0.76, z: 1}
+--- !u!225 &583547889237698909
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6949364699072442115}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8242025891952291233
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,7 +537,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35.3
+  m_fontSize: 52.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

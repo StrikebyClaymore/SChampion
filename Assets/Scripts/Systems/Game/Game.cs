@@ -12,6 +12,7 @@ namespace Systems.Game
     public abstract class GameBase : MonoBehaviour
     {
         [field: SerializeField] public TextMeshProUGUI BalanceText { get; private set; }
+        [field: SerializeField] public RectTransform StarImage { get; private set; }
         [field: SerializeField] public CustomPushButton PauseButton { get; private set; }
         [SerializeField] private GameObject _timerPanel;
         [SerializeField] private TextMeshProUGUI _timerText;
@@ -49,7 +50,7 @@ namespace Systems.Game
 
         protected virtual void Awake()
         {
-            _despawnArea.OnTriggerEnter.AddListener(EntityDespawn);
+            _despawnArea.OnTriggerEnter.AddListener((entity) => EntityDespawn(entity, false));
         }
 
         public virtual void CustomUpdate()
@@ -164,7 +165,7 @@ namespace Systems.Game
                 case EEntities.Star:
                     PlayerData.AddIntValue(GameConstants.MONEY_SAVE_KEY, entity.Value);
                     GameEvents.InvokeMoneyChanged(PlayerData.GetInt(GameConstants.MONEY_SAVE_KEY));
-                    EntityDespawn(entity);
+                    EntityDespawn(entity, true);
                     break;
                 case EEntities.Finish:
                     WinGame();
@@ -181,7 +182,7 @@ namespace Systems.Game
             }
             var value = entity.Value;
             var entityPosition = entity.transform.position;
-            EntityDespawn(entity);
+            EntityDespawn(entity, true);
             var halfSize = _balls[0].HalfSize;
             for (int i = 0; i < value; i++)
             {
@@ -209,10 +210,8 @@ namespace Systems.Game
             if(ball == null)
                 ball = Instantiate(_ballPrefab);
             spawnPosition.z = 0;
-            ball.transform.position = spawnPosition;
+            ball.Spawn(spawnPosition);
             ball.OnTriggerEnter.AddListener(BallCollide);
-            ball.RB.isKinematic = false;
-            ball.RB.constraints = RigidbodyConstraints2D.FreezeRotation;
             _balls.Add(ball);
             ball.Push();
             return ball;
@@ -220,10 +219,8 @@ namespace Systems.Game
 
         private void BallDespawn(Ball ball)
         {
-            ball.RB.isKinematic = true;
-            ball.transform.SetParent(null);
             ball.OnTriggerEnter.RemoveListener(BallCollide);
-            ball.gameObject.SetActive(false);
+            ball.Release();
             _balls.Remove(ball);
             _ballsPool.Add(ball);
         }
@@ -234,10 +231,10 @@ namespace Systems.Game
             for (int i = 0; i < _entitiesPool.Count; i++)
             {
                 var entityInPool = _entitiesPool[i];
-                if (entityInPool.Type == type && !_entities.Contains(entityInPool))
+                if (entityInPool.Type == type && !entityInPool.gameObject.activeSelf && !_entities.Contains(entityInPool))
                 {
                     entity = entityInPool;
-                    entity.gameObject.SetActive(true);
+                    entity.Spawn();
                     _entitiesPool.Remove(entity);
                     _entities.Add(entity);
                     return entity;
@@ -259,9 +256,12 @@ namespace Systems.Game
             return entity;
         }
 
-        protected void EntityDespawn(Entity entity)
+        protected void EntityDespawn(Entity entity, bool animate)
         {
-            entity.Release();
+            if (animate)
+                entity.AnimateRelease();
+            else
+                entity.Release();
             _entities.Remove(entity);
             _entitiesPool.Add(entity);
         }
@@ -293,7 +293,7 @@ namespace Systems.Game
             obstacle.Text.SetText(obstacle.Value.ToString());
             BallDespawn(ball);
             if (obstacle.Value == 0)
-                EntityDespawn(obstacle);
+                EntityDespawn(obstacle, true);
             if(_balls.Count == 0)
                 LoseGame();
         }
@@ -303,7 +303,7 @@ namespace Systems.Game
             _levelCompleted = false;
             if (_finish && _entitiesPool.Contains(_finish))
             {
-                _finish.gameObject.SetActive(true);
+                _finish.Spawn();
                 _entitiesPool.Remove(_finish);
             }
             else
@@ -345,7 +345,7 @@ namespace Systems.Game
                         SpawnWave();
                     return;
                 }
-                _timeLeft = 1f;
+                _timeLeft = 2f;
                 _levelCompleted = true;
                 return;   
             }

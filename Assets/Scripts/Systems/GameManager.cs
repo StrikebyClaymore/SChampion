@@ -1,8 +1,13 @@
-﻿using Extensions;
+﻿using System;
+using System.Collections.Generic;
+using DG.Tweening;
+using Extensions;
 using Systems.Game;
+using Systems.Game.Entities;
 using UI;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Screen = UnityEngine.Device.Screen;
 
 namespace Systems
 {
@@ -30,10 +35,16 @@ namespace Systems
         [SerializeField] private GameBase _footballPrefab;
         [SerializeField] private GameBase _basketballPrefab;
         [Header("Another")]
+        private static GameManager _instance;
+        public static GameManager Instance => _instance;
+        private List<AudioSource> _audioSourcePool = new List<AudioSource>(10);
+        private List<AudioSource> _audioSources = new List<AudioSource>(10);
         [SerializeField] private AudioSource _backgroundAudioSource;
         [SerializeField] private AudioSource _uiAudioSource;
-        [SerializeField] private AudioSource _effectsSource;
         [SerializeField] private AudioClip _levelCompletedClip;
+        [SerializeField] private AudioClip _starPickupClip;
+        [SerializeField] private AudioClip _bonusPickupClip;
+        [SerializeField] private AudioClip _obstacleDestroyClip;
         private GameBase _gameInstance;
         private int _gameType;
         private int _levelMode;
@@ -45,6 +56,7 @@ namespace Systems
 
         private void Awake()
         {
+            _instance = this;
             DisableAll();
             Initialize();
             _loadingBar.StartLoading();
@@ -412,8 +424,7 @@ namespace Systems
             _main.Show();
             _levels.Show();
             _levels.LevelComplete();
-            _effectsSource.clip = _levelCompletedClip;
-            _effectsSource.Play();
+            PlaySound(_levelCompletedClip);
         }
 
         private void LoseGame()
@@ -476,7 +487,64 @@ namespace Systems
         }
 
         #endregion
+
+        #region Sound Manager
+
+        public void PlaySound(AudioClip clip)
+        {
+            AudioSource audioSource = null;
+            for (int i = 0; i < _audioSourcePool.Count; i++)
+            {
+                if (!_audioSourcePool[i].isPlaying)
+                {
+                    audioSource = _audioSourcePool[i];
+                    _audioSourcePool.Remove(audioSource);
+                    break;
+                }
+            }
+            if (audioSource == null)
+                audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSources.Add(audioSource);
+            
+            audioSource.clip = clip;
+            audioSource.Play();
+        }
+
+        #endregion
         
+        #endregion
+
+        #region Animations
+
+        public Sequence AnimateEntityRelease(Entity entity)
+        {
+            Sequence sequence = DOTween.Sequence();
+            var rect = entity.Rect;
+            switch (entity.Type)
+            {
+                case EEntities.Obstacle:
+                    sequence.Append(rect.DOLocalMoveY(rect.anchoredPosition.y + rect.sizeDelta.y / 2, 0.5f).SetEase(Ease.InQuad));
+                    sequence.Join(rect.DOScale(0.8f, 0.5f));
+                    sequence.Append(rect.DOLocalMoveY(-Screen.height - rect.sizeDelta.y, 2f).SetEase(Ease.Linear));
+                    PlaySound(_obstacleDestroyClip);
+                    break;
+                case EEntities.Bonus:
+                    sequence.Append(rect.DOScale(0f, 0f));
+                    PlaySound(_bonusPickupClip);
+                    break;
+                case EEntities.Star:
+                    Vector3 targetPosition = _gameInstance.StarImage.TransformPoint(_gameInstance.StarImage.anchoredPosition);
+                    entity.transform.SetParent(_gameplay.transform);
+                    sequence.Append(rect.DOMoveX(targetPosition.x, 0.25f).SetEase(Ease.OutCirc));
+                    sequence.Join(rect.DOMoveY(targetPosition.y, 0.5f).SetEase(Ease.InCirc));
+                    PlaySound(_starPickupClip);
+                    break;
+                case EEntities.Finish:
+                    break;
+            }
+            return sequence;
+        }
+
         #endregion
     }
 }

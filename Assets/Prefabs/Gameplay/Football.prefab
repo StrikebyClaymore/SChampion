@@ -2590,6 +2590,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <BalanceText>k__BackingField: {fileID: 8954852117438072981}
+  <StarImage>k__BackingField: {fileID: 8510052044198152551}
   <PauseButton>k__BackingField: {fileID: 1267673486981234193}
   _timerPanel: {fileID: 8501264985283180444}
   _timerText: {fileID: 8109411520428939585}

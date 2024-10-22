@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using Extensions;
 using Systems;
 using TMPro;
@@ -21,7 +22,6 @@ namespace UI
         [SerializeField] private GameTypePanel _gameTypePanelPrefab;
         [SerializeField] private GameTypeData[] _gameTypes;
         [SerializeField] private string LockTextFormat = "TO UNLOCK THIS MODE YOU NEED {0} STARS";
-        [SerializeField] private Vector3 _notSelectedScale = new Vector3(0.76f, 0.76f, 1);
         [SerializeField] private Vector2 _notSelectedOffset = new Vector3(162, 0);
         private List<GameTypePanel> _panels = new List<GameTypePanel>();
         private int _currentPanelIndex;
@@ -72,7 +72,6 @@ namespace UI
             for (int i = 1; i < _panels.Count; i++)
             {
                 var panel = _panels[i];
-                panel.transform.localScale = _notSelectedScale;
                 var step = _notSelectedOffset * i;
                 panel.GetComponent<RectTransform>().anchoredPosition += step;
             }
@@ -91,15 +90,14 @@ namespace UI
         private void Move(int direction)
         {
             var currPanel = _panels[_currentPanelIndex];
-            currPanel.transform.localScale = _notSelectedScale;
             currPanel.Deselect();
             _currentPanelIndex += direction;
             currPanel = _panels[_currentPanelIndex];
-            currPanel.transform.localScale = Vector3.one;
             currPanel.Select();
             for (int i = 0; i < _panels.Count; i++)
             {
-                _panels[i].GetComponent<RectTransform>().anchoredPosition -= _notSelectedOffset * direction;
+                var rect = _panels[i].Rect; 
+                rect.DOAnchorPos(rect.anchoredPosition - _notSelectedOffset * direction, 0.3f);
             }
             ShowLeftAndRight();
             OnSwitchGameType?.Invoke(_currentPanelIndex);

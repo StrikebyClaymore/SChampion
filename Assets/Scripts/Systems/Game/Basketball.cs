@@ -41,7 +41,7 @@ namespace Systems.Game
             }
             var value = entity.Value;
             var entityPosition = entity.transform.position;
-            EntityDespawn(entity);
+            EntityDespawn(entity, true);
             var firstBall = _balls[0];
             var halfSize = firstBall.HalfSize;
             for (int i = 0; i < value; i++)

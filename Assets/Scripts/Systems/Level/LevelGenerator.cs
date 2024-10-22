@@ -99,7 +99,7 @@ namespace Systems
         {
             var wave = new LevelWave
             {
-                Type = EEntities.Obstacle,
+                Type = EEntities.Star,
                 Delay = Random.Range(0.5f, 1f),
                 Numbers = new int[MAX_WAVE_SIZE]
             };
