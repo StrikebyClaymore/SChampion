@@ -15,14 +15,14 @@ namespace Systems.Game.Entities
         [SerializeField] private Vector3 _endScale;
         public readonly UnityEvent<Entity> OnTriggerEnter = new();
 
-        public void Spawn(Vector3 position)
+        public void Spawn(Vector3 position, bool isBallChild)
         {
             transform.position = position;
             RB.isKinematic = false;
             Collider.enabled = true;
             RB.constraints = RigidbodyConstraints2D.FreezeRotation;
             transform.localScale = _initialScale;
-            transform.DOScale(_endScale, 0.3f);
+            transform.DOScale(isBallChild ? Vector3.one : _endScale, 0.3f);
         }
 
         public void Release()

@@ -153,6 +153,8 @@ namespace Systems.Game
         
         private void BallCollide(Entity entity)
         {
+            if(entity.Value == 0)
+                return;
             var ball = _balls[^1];
             switch (entity.Type)
             {
@@ -177,7 +179,7 @@ namespace Systems.Game
         {
             if (entity == null)
             {
-                SpawnBall(_ballStartPoint.position);
+                SpawnBall(_ballStartPoint.position, false);
                 return;
             }
             var value = entity.Value;
@@ -192,12 +194,12 @@ namespace Systems.Game
                     spawnPosition = new Vector3(_balls[^1].transform.position.x, spawnPosition.y + _balls.Count * halfSize, spawnPosition.z);
                 float xOffset = Mathf.Min(halfSize, entityPosition.x - spawnPosition.x);
                 spawnPosition.x += xOffset;
-                var ball = SpawnBall(spawnPosition);
+                var ball = SpawnBall(spawnPosition, false);
                 ball.InitialOffset = ball.transform.position.x - _balls[0].transform.position.x;
             }
         }
 
-        protected Ball SpawnBall(Vector3 spawnPosition)
+        protected Ball SpawnBall(Vector3 spawnPosition, bool isBallChild)
         {
             Ball ball = null;
             foreach (var b in _ballsPool)
@@ -210,7 +212,7 @@ namespace Systems.Game
             if(ball == null)
                 ball = Instantiate(_ballPrefab);
             spawnPosition.z = 0;
-            ball.Spawn(spawnPosition);
+            ball.Spawn(spawnPosition, isBallChild);
             ball.OnTriggerEnter.AddListener(BallCollide);
             _balls.Add(ball);
             ball.Push();

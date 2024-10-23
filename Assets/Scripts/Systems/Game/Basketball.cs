@@ -36,7 +36,7 @@ namespace Systems.Game
         {
             if (entity == null)
             {
-                SpawnBall(_ballStartPoint.position);
+                SpawnBall(_ballStartPoint.position, false);
                 return;
             }
             var value = entity.Value;
@@ -52,7 +52,7 @@ namespace Systems.Game
                     spawnPosition = new Vector3(spawnPosition.x + _balls.Count * halfSize, _balls[^1].transform.position.y, spawnPosition.z);
                 float yOffset = Mathf.Min(halfSize, entityPosition.y - spawnPosition.y);
                 spawnPosition.y += yOffset;
-                var ball = SpawnBall(spawnPosition);
+                var ball = SpawnBall(spawnPosition, true);
                 ball.RB.isKinematic = true;
                 ball.RB.constraints = RigidbodyConstraints2D.FreezeAll;
                 ball.transform.SetParent(firstBall.transform);;
