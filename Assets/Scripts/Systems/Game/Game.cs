@@ -312,6 +312,7 @@ namespace Systems.Game
             {
                 _finish = Instantiate(_finishPrefab, _entitiesContainer);
             }
+            _finish.Value = 1;
             _finish.Rect.anchoredPosition = _finishSpawnPosition;
             _entities.Add(_finish);
         }
